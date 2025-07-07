@@ -12,7 +12,7 @@ def data_import(page_limit=1000000):
         count += 1
         if count == page_limit:
             break
-    return text_corpus
+    return text_corpus # возвращает список текстов
 
 '''
 снижение размерности многомерных векторов для отображения в двумерном пространстве
