@@ -1,4 +1,4 @@
-from word2vec import Word2Vec, softmax
+from .word2vec import Word2Vec, softmax
 import numpy as np 
 
 class CBOW(Word2Vec):
