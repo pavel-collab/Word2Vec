@@ -21,7 +21,7 @@ def load_data_to_db(text_corpus: list, db_path='texts.db'):
                             (i, doc))
     conn.commit()
     
-def import_texts(limit=100, db_path='texts.db'):
+def import_texts(db_path='texts.db', limit=100):
     if not Path(db_path).exists():
         raise FileNotFoundError(f'there are no file {Path(db_path).absolute()}')
     
@@ -30,4 +30,11 @@ def import_texts(limit=100, db_path='texts.db'):
     cursor.execute('''SELECT text FROM documents LIMIT ?''', (limit,))
 
     texts = cursor.fetchall()
+    '''
+    При извлечении из базы данных sqlite нам возвращаются не строки,
+    а кортежи строк. В каждом кортеже один единственный элемент --
+    сохраненная строка. А мы хотим получить просто список строк.
+    '''
+    for i in range(len(texts)):
+        texts[i] = texts[i][0]
     return texts

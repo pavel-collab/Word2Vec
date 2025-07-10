@@ -30,7 +30,7 @@ def reduce_to_k_dim(M, k=2):
 На вход подается матрица эмбеддингов (n_samples, dim) и список слов,
 причем порядок слов соответсвует порядку эмбеддингов в матрице
 '''
-def plot_embeddings(embedding_matrix, words):
+def plot_embeddings(embedding_matrix, words, save=False, model_name=None):
     assert embedding_matrix.shape[1] == 2
 
     plt.figure(num=None, figsize=(7, 7), dpi=80, facecolor='w', edgecolor='k')
@@ -42,7 +42,10 @@ def plot_embeddings(embedding_matrix, words):
         y = y_values[i]
         plt.scatter(x, y, marker='x', color='red')
         plt.text(x, y, word, fontsize=9)
-    plt.show()
+    if not save or model_name is None:
+        plt.show()
+    else:
+        plt.savefig(f'./images/{model_name}.png')
     
 # Генерируем тренировочный корпус слов
 def preprocess_text(text_corpus: list):
@@ -104,3 +107,17 @@ def generate_cbow_pairs(corpus, window_size=2):
             cbow_pairs.append((text[i], context_words))
         
     return cbow_pairs
+
+DEBUG = True
+
+def debug_print(print_func):
+    """Декоратор для создания отладочной версии функции печати"""
+    def wrapper(*args, **kwargs):
+        if DEBUG:
+            # Добавляем префикс [DEBUG] к выводу
+            new_args = ("[DEBUG]", *args)
+            return print_func(*new_args, **kwargs)
+        return None
+    return wrapper
+
+debug_print = debug_print(print)

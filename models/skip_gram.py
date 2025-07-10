@@ -1,5 +1,6 @@
 from .word2vec import Word2Vec, softmax
 import numpy as np 
+from tqdm import tqdm
 
 class SkipGram(Word2Vec):
     # Прямой проход
@@ -31,7 +32,7 @@ class SkipGram(Word2Vec):
     # Тренировка модели
     def train(self, training_data, epochs=100, learning_rate=0.01):
         losses = []
-        for epoch in range(epochs):
+        for epoch in tqdm(range(epochs)):
             total_loss = 0
             for center_word, context_word in training_data:
                 # One-hot encoding центровых слов
