@@ -1,32 +1,48 @@
 from .word2vec import Word2Vec, softmax
 import numpy as np 
 from tqdm import tqdm
+from numba import njit
 
+@njit(cache=True)
+def compute_intermediate_layers(input_vector, W_in, W_out):
+    # получаем промежуточное представление (по-сути получаем эмбеддинг слова)
+    hidden_layer = np.dot(input_vector, W_in)
+    # получаем распределение вероятностей на слова контекста
+    output_layer = np.dot(hidden_layer, W_out)
+    return hidden_layer, output_layer
+
+@njit(cache=True)
+def opt_dot(X, Y):
+    res = np.dot(X, Y)
+    return res
+    
+@njit(cache=True)
+def opt_outer(X, Y):
+    res = np.outer(X, Y)
+    return res
+    
 class SkipGram(Word2Vec):
     # Прямой проход
     # на вход подается one-hot вектор центрального слова
     def forward(self, input_vector):
-        # получаем промежуточное представление (по-сути получаем эмбеддинг слова)
-        hidden_layer = np.dot(input_vector, self.W_in)
-        # получаем распределение вероятностей на слова контекста
-        output_layer = np.dot(hidden_layer, self.W_out)
+        hidden_layer, output_layer = compute_intermediate_layers(input_vector, self.W_in, self.W_out)
         prediction = softmax(output_layer)
         return prediction, hidden_layer
     
-    # Обратное распространение
+    # Обратное распространение 
     def backward(self, x, h, y_true, learning_rate=0.01):
         # Вычисляем ошибку на последнем слое
         delta = y_true - h
         
         # Обновляем выходной слой
-        dW_out = np.outer(x, delta)
+        dW_out = opt_outer(x, delta)
         self.W_out += learning_rate * dW_out
         
         # Рассчитываем градиент для скрытого слоя
-        dh = np.dot(delta, self.W_out.T)
+        dh = opt_dot(delta, self.W_out.T)
         
         # Обновляем входной слой
-        dW_in = np.outer(h, dh)
+        dW_in = opt_outer(h, dh)
         self.W_in += learning_rate * dW_in
     
     # Тренировка модели

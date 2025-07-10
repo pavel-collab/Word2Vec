@@ -1,13 +1,29 @@
 from .word2vec import Word2Vec, softmax
 import numpy as np 
 from tqdm import tqdm
+from numba import njit
+
+@njit(cache=True)
+def opt_dot(X, Y):
+    res = np.dot(X, Y)
+    return res
+    
+@njit(cache=True)
+def opt_outer(X, Y):
+    res = np.outer(X, Y)
+    return res
+
+@njit(cache=True)
+def compute_intermediate_layer(context_vectors, W_in, W_out):
+    hidden_layer = np.mean(np.dot(context_vectors, W_in), axis=0) # матрица умножается на матрицу и итог усредняется по строкам
+    output_layer = np.dot(hidden_layer, W_out) # таким образом на выходе мы получаем вектор
+    return hidden_layer, output_layer
 
 class CBOW(Word2Vec):
     
-    # Прямой проход через сеть
+    # Прямой проход через сеть 
     def forward(self, context_vectors): #? на вход подается контекстная матрица one-hot векторов
-        hidden_layer = np.mean(np.dot(context_vectors, self.W_in), axis=0) # матрица умножается на матрицу и итог усредняется по строкам
-        output_layer = np.dot(hidden_layer, self.W_out) # таким образом на выходе мы получаем вектор
+        hidden_layer, output_layer = compute_intermediate_layer(context_vectors, self.W_in, self.W_out)
         prediction = softmax(output_layer)
         return prediction, hidden_layer
     
@@ -17,14 +33,14 @@ class CBOW(Word2Vec):
         delta = y_true - h
         
         # Обновляем выходной слой
-        dW_out = np.outer(x, delta)
+        dW_out = opt_outer(x, delta)
         self.W_out += learning_rate * dW_out
         
         # Рассчитываем градиент для скрытого слоя
-        dh = np.dot(delta, self.W_out.T)
+        dh = opt_dot(delta, self.W_out.T)
         
         # Обновляем входной слой
-        dW_in = np.outer(h, dh)
+        dW_in = opt_outer(h, dh)
         self.W_in += learning_rate * dW_in
     
     # Обучение модели

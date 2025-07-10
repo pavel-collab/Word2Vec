@@ -13,12 +13,13 @@ from utils import debug_print
 DB_NAME = 'db.sqlite3'
 EMBEDDING_DIM = 100
 EPOCH_NUM = 50
+ARTICLE_LIMIT = 5000
 
 debug_print('Start to import data')
 if Path(DB_NAME).exists():
-    text_corpus = import_texts(DB_NAME, limit=5000)
+    text_corpus = import_texts(DB_NAME, limit=ARTICLE_LIMIT)
 else:
-    text_corpus = data_import(page_limit=5000)
+    text_corpus = data_import(page_limit=ARTICLE_LIMIT)
     load_data_to_db(text_corpus, DB_NAME)
     
 debug_print('Start to preprocess data')
