@@ -16,9 +16,9 @@ EPOCH_NUM = 50
 
 debug_print('Start to import data')
 if Path(DB_NAME).exists():
-    text_corpus = import_texts(DB_NAME, limit=5000)
+    text_corpus = import_texts(DB_NAME, limit=10)
 else:
-    text_corpus = data_import(page_limit=5000)
+    text_corpus = data_import(page_limit=10)
     load_data_to_db(text_corpus, DB_NAME)
     
 debug_print('Start to preprocess data')
@@ -45,9 +45,9 @@ finally:
         
 fig1, ax1 = plt.subplots(figsize=(8, 6))  # Размер графика: 8x6 дюймов
 ax1.plot(np.arange(len(skip_gram_losses)), skip_gram_losses)
-ax1.xlabel('Training step')
-ax1.ylabel('Loss')
-ax1.title('Loss for skip-gram')
+plt.xlabel('Training step')
+plt.ylabel('Loss')
+plt.title('Loss for skip-gram')
 plt.savefig('./images/skip_gram_model.png')
 plt.close(fig1)
 
@@ -63,32 +63,8 @@ finally:
         
 fig2, ax2 = plt.subplots(figsize=(8, 6))
 ax2.plot(np.arange(len(cbow_losses)), cbow_losses)
-ax2.xlabel('Training step')
-ax2.ylabel('Loss')
-ax2.title('Loss for cbow')
+plt.xlabel('Training step')
+plt.ylabel('Loss')
+plt.title('Loss for cbow')
 plt.savefig('./images/cbow_model.png')
 plt.close(fig2)
-
-# получаем список индексов
-word_idxs = []
-for word in test_vocab:
-    word_idxs.append(vocab[word])
-
-# получаем эмбеддинги для skip-gram и cbow
-skip_gram_embeddings = []
-for word in test_vocab:
-    skip_gram_embeddings.append(skip_gram_model.embed(word))
-
-cbow_embeddings = []
-for word in test_vocab:
-    cbow_embeddings.append(cbow_model.embed(word))
-    
-skip_gram_embeddings = np.array(skip_gram_embeddings)
-cbow_embeddings = np.array(cbow_embeddings)
-
-reduced_skip_gram_embeddings = reduce_to_k_dim(skip_gram_embeddings)
-reduced_cbow_embeddings = reduce_to_k_dim(cbow_embeddings)
-
-plot_embeddings(reduced_skip_gram_embeddings, test_vocab, save=True, model_name='skip_gram')
-
-plot_embeddings(reduced_cbow_embeddings, test_vocab, save=True, model_name='cbow')
