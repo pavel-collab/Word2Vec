@@ -13,7 +13,7 @@ from utils import debug_print
 DB_NAME = 'db.sqlite3'
 EMBEDDING_DIM = 100
 EPOCH_NUM = 50
-ARTICLE_LIMIT = 10
+ARTICLE_LIMIT = 50
 
 debug_print('Start to import data')
 if Path(DB_NAME).exists():
@@ -46,9 +46,9 @@ finally:
         
 fig1, ax1 = plt.subplots(figsize=(8, 6))  # Размер графика: 8x6 дюймов
 ax1.plot(np.arange(len(skip_gram_losses)), skip_gram_losses)
-ax1.xlabel('Training step')
-ax1.ylabel('Loss')
-ax1.title('Loss for skip-gram')
+plt.xlabel('Training step')
+plt.ylabel('Loss')
+plt.title('Loss for skip-gram')
 plt.savefig('./images/skip_gram_model.png')
 plt.close(fig1)
 
@@ -64,8 +64,8 @@ finally:
         
 fig2, ax2 = plt.subplots(figsize=(8, 6))
 ax2.plot(np.arange(len(cbow_losses)), cbow_losses)
-ax2.xlabel('Training step')
-ax2.ylabel('Loss')
-ax2.title('Loss for cbow')
+plt.xlabel('Training step')
+plt.ylabel('Loss')
+plt.title('Loss for cbow')
 plt.savefig('./images/cbow_model.png')
 plt.close(fig2)
