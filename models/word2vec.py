@@ -1,8 +1,9 @@
 import numpy as np
+import torch
 
 # Softmax функция для вывода вероятностей классов
 def softmax(x):
-    e_x = np.exp(x - np.max(x))  # Устойчивость к переполнению экспоненты
+    e_x = torch.exp(x - np.max(x))  # Устойчивость к переполнению экспоненты
     return e_x / e_x.sum(axis=-1, keepdims=True)
 
 class Word2Vec:
@@ -10,6 +11,8 @@ class Word2Vec:
         self.vocabulary_size = vocabulary_size
         self.embedding_dim = embedding_dim
         self.vocab = vocab
+        
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
         
         # Весовые матрицы
         # матрица эмбеддингов, именно ее мы обучаем

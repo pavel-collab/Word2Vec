@@ -13,7 +13,7 @@ from utils import debug_print
 DB_NAME = 'db.sqlite3'
 EMBEDDING_DIM = 100
 EPOCH_NUM = 50
-ARTICLE_LIMIT = 5000
+ARTICLE_LIMIT = 10
 
 debug_print('Start to import data')
 if Path(DB_NAME).exists():
@@ -69,27 +69,3 @@ ax2.ylabel('Loss')
 ax2.title('Loss for cbow')
 plt.savefig('./images/cbow_model.png')
 plt.close(fig2)
-
-# получаем список индексов
-word_idxs = []
-for word in test_vocab:
-    word_idxs.append(vocab[word])
-
-# получаем эмбеддинги для skip-gram и cbow
-skip_gram_embeddings = []
-for word in test_vocab:
-    skip_gram_embeddings.append(skip_gram_model.embed(word))
-
-cbow_embeddings = []
-for word in test_vocab:
-    cbow_embeddings.append(cbow_model.embed(word))
-    
-skip_gram_embeddings = np.array(skip_gram_embeddings)
-cbow_embeddings = np.array(cbow_embeddings)
-
-reduced_skip_gram_embeddings = reduce_to_k_dim(skip_gram_embeddings)
-reduced_cbow_embeddings = reduce_to_k_dim(cbow_embeddings)
-
-plot_embeddings(reduced_skip_gram_embeddings, test_vocab, save=True, model_name='skip_gram')
-
-plot_embeddings(reduced_cbow_embeddings, test_vocab, save=True, model_name='cbow')
